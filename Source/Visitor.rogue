@@ -1,0 +1,108 @@
+module Days
+
+class Visitor
+  GLOBAL PROPERTIES
+    type_Cmd = <<Cmd>>
+
+  METHODS
+    method visit( cmd:Cmd )->Cmd
+      if (cmd.type_info is type_Cmd) return cmd
+      return cmd.dispatch( this )
+
+    method visit( list:CmdList )->CmdList
+      forEach (cmd at index in list)
+        if (cmd) list[ index ] = cmd.dispatch( this )
+      endForEach
+      return list
+
+    method visit( statements:Statements )->Statements
+      forEach (statement at index in statements)
+        if (statement) statements[ index ] = statement.dispatch( this )
+      endForEach
+      return statements
+
+    method visit( cmd:Unary )->Unary
+      if (cmd.operand) cmd.operand = cmd.operand.dispatch( this )
+      return cmd
+
+    method visit( cmd:PostUnary )->PostUnary
+      if (cmd.operand) cmd.operand = cmd.operand.dispatch( this )
+      return cmd
+
+    method visit( cmd:Binary )->Binary
+      if (cmd.left)  cmd.left  = cmd.left.dispatch( this )
+      if (cmd.right) cmd.right = cmd.right.dispatch( this )
+      return cmd
+
+    method visit( cmd:Add )->Cmd
+      if (cmd.left)  cmd.left  = cmd.left.dispatch( this )
+      if (cmd.right) cmd.right = cmd.right.dispatch( this )
+      return cmd
+
+    method visit( cmd:Subtract )->Cmd
+      if (cmd.left)  cmd.left  = cmd.left.dispatch( this )
+      if (cmd.right) cmd.right = cmd.right.dispatch( this )
+      return cmd
+
+    method visit( cmd:Today )->Cmd
+      return cmd
+
+    method visit( cmd:IntervalDays )->Cmd
+      return cmd
+
+    method visit( cmd:IntervalYears )->Cmd
+      return cmd
+
+    method visit( cmd:IntervalMonths )->Cmd
+      return cmd
+
+    method visit( cmd:IntervalWeeks )->Cmd
+      return cmd
+
+    method visit( cmd:Month )->Cmd
+      return cmd
+
+    method visit( cmd:Day )->Cmd
+      return cmd
+
+    method visit( cmd:Year )->Cmd
+      return cmd
+
+    method visit( cmd:MDY )->Cmd
+      if (cmd.month) cmd.month = cmd.month.dispatch( this )
+      if (cmd.day) cmd.day = cmd.day.dispatch( this )
+      if (cmd.year) cmd.year = cmd.year.dispatch( this )
+      return cmd
+
+    method visit( cmd:MD )->Cmd
+      if (cmd.month) cmd.month = cmd.month.dispatch( this )
+      if (cmd.day) cmd.day = cmd.day.dispatch( this )
+      return cmd
+
+    method visit( cmd:DMY )->Cmd
+      if (cmd.day) cmd.day = cmd.day.dispatch( this )
+      if (cmd.month) cmd.month = cmd.month.dispatch( this )
+      if (cmd.year) cmd.year = cmd.year.dispatch( this )
+      return cmd
+
+    method visit( cmd:DM )->Cmd
+      if (cmd.day) cmd.day = cmd.day.dispatch( this )
+      if (cmd.month) cmd.month = cmd.month.dispatch( this )
+      return cmd
+
+    method visit( cmd:MDYOrYMD )->Cmd
+      if (cmd.month) cmd.month = cmd.month.dispatch( this )
+      if (cmd.day) cmd.day = cmd.day.dispatch( this )
+      if (cmd.year) cmd.year = cmd.year.dispatch( this )
+      return cmd
+
+    method visit( cmd:Yesterday )->Cmd
+      return cmd
+
+    method visit( cmd:Tomorrow )->Cmd
+      return cmd
+
+
+    method visit( cmd:Help )->Cmd
+      return cmd
+endClass

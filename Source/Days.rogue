@@ -1,0 +1,79 @@
+module Days
+
+$define VERSION_INFO "v2.0 - May 25, 2020 by Abe Pralle"
+
+$requireRogue "1.7.3"
+
+$include "DaysValue.rogue"
+$include "Parser.rogue"
+$include "Resolver.rogue"
+
+Days()
+
+class Days
+  METHODS
+    method init
+      # Parse input or file by repeatedly calling first method defined in parser.
+      local parser = Parser()
+      if (System.command_line_arguments.count)
+        try
+          local args = System.command_line_arguments.join( " " )
+          if (File.exists(args))
+            # Parse contents of file
+            parser.open( File(args) )
+          else
+            parser.open( "[Command Line]", args )
+          endIf
+
+          if (not parser.methods.is_empty)
+            while (parser.has_another)
+              print_results( parser.parse(parser.methods[0]) )
+            endWhile
+          endIf
+        catch (err:Error)
+          Console.error.println err
+        endTry
+
+      else
+        # Interactive mode
+        println "Enter h or ? for help."
+        loop
+          try
+            local input = Console.input( "> " )
+            if (input == "q") escapeLoop
+            parser.open( "[Command Line]", input )
+            if (not parser.methods.is_empty)
+              while (parser.has_another)
+                print_results( parser.parse(parser.methods[0]) )
+              endWhile
+            endIf
+          catch (err:Error)
+            Console.error.println err
+          endTry
+        endLoop
+      endIf
+
+    method print_results( cmd:Cmd )
+      cmd = Resolver().resolve( cmd )
+      if (cmd instanceOf MDY)
+        local date = cmd.evaluate.date.value
+        if (date > Date.today)
+          println "$ until $, $" ("# day".pluralized(date-Date.today),date.day_name,date->String(&verbose))
+        elseIf (date < Date.today)
+          println "$ since $, $" ("# day".pluralized(Date.today-date),date.day_name,date->String(&verbose))
+        else
+          println "That's today."
+        endIf
+      else
+        local result = cmd.evaluate
+        if (result.date or result.interval)
+          print result
+          if (result.date)
+            local date = result.date.value
+            print " | $, $" (date.day_name,date->String(&verbose))
+          endIf
+          println
+        endIf
+      endIf
+endClass
+

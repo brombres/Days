@@ -1,0 +1,34 @@
+module Days
+
+class DaysValue( date:Date?, interval:DateInterval? ) [compound]
+  GLOBAL METHODS
+    method create( date:Date )->DaysValue
+      return DaysValue( date, null )
+
+    method create( interval:DateInterval )->DaysValue
+      return DaysValue( null, interval )
+
+  METHODS
+    method operator+( other:DaysValue )->DaysValue
+      # Requires: Date+Interval, Interval+Date, or Interval+Interval
+      if (date or other.date)
+        # Date + Interval or Interval + Date
+        local date     = which{ date:date.value || other.date.value }
+        local interval = which{ interval:interval.value || other.interval.value }
+        return DaysValue( date + interval )
+      else
+        return DaysValue( interval.value + other.interval.value )
+      endIf
+
+    method operator-( other:DaysValue )->DaysValue
+      # Requires: Date-Date or Date-Interval
+      if (other.date)
+        return DaysValue( DateInterval.days(date.value-other.date.value) )
+      else
+        return DaysValue( date.value - other.interval.value )
+      endIf
+
+    method to->String
+      if (date) return date.value->String( "yyyy.mm.dd" )
+      else      return interval.value->String
+endClass

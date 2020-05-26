@@ -1,0 +1,13 @@
+module Days
+
+class CmdInitArgs : Cmd[]
+  PROPERTIES
+    t : Token
+
+  METHODS
+    method require_count( required_count:Int32 )
+      if (count != required_count)
+        throw Error( "[Days]", "init(t,args) got $, expected $." ("# arg".pluralized(count),required_count) )
+      endIf
+endClass
+

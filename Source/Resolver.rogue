@@ -1,0 +1,48 @@
+module Days
+
+class Resolver : Visitor
+  METHODS
+    method resolve( cmd:Cmd )->Cmd
+      if (not cmd) return null
+      return cmd.dispatch( this )
+
+    method visit( cmd:MD )->Cmd
+      local y = Date.today.year
+      local m = cmd.month->Int32.clamped( 1, 12 )
+      local d = cmd.day->Int32.clamped_low( 1 )
+      if (d >= 100)
+        # Interpret the day as the year - "May 2020"
+        y = d
+        d = 1
+      else
+        d = d.clamped_high( Date.days_in_month(y,m) )
+      endIf
+      local t = cmd.t
+      return resolve( MDY(t,Month(t,m),Day(t,d),Year(t,y)) )
+
+    method visit( cmd:MDYOrYMD )->Cmd
+      local m = cmd.month->Int32
+      local d = cmd.day->Int32
+      local y = cmd.year->Int32
+
+      if (m >= 100)
+        # MDY is actually YMD
+        swapValues( m, y )
+        swapValues( m, d )
+      endIf
+
+      y = y.clamped_low( 1 )
+      m = m.clamped( 1, 12 )
+      d = d.clamped( 1, Date.days_in_month(y,m) )
+      local t = cmd.t
+      return resolve( MDY(t, Month(t,m), Day(t,d), Year(t,y)) )
+
+    method visit( cmd:DMY )->Cmd
+      local t = cmd.t
+      return resolve( MDY(t,cmd.month,cmd.day,cmd.year) )
+
+    method visit( cmd:DM )->Cmd
+      local t = cmd.t
+      return resolve( MD(t,cmd.month,cmd.day) )
+
+endClass

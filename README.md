@@ -70,7 +70,7 @@ Command line utility to compute dates and intervals.
 ## Development Notes
 
 1. *Days* was developed using the [Froley](https://github.com/AbePralle/Froley) parser generator.
-2. `rogo --create --project=Days` was used to set up the project.
+2. `rogo --create --project=Days` was used to set up the project. The "main file", `Source/Days.rogue`, was then deleted so that Froley would generate a new parser wrapper in its place.
 3. The [Days.froley](Source/Days.froley) tokenizer and parser definition file was copied from Froley's "Simple" example and modified.
 4. The Froley compile command (to generate Rogue parser classes from `Days.froley`) was added to [Build.rogue](Build.rogue).
 5. `rogo froley` generated most of the code in `Source/`.

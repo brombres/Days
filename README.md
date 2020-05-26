@@ -75,6 +75,6 @@ Command line utility to compute dates and intervals.
 4. The Froley compile command (to generate Rogue parser classes from `Days.froley`) was added to [Build.rogue](Build.rogue).
 5. `rogo froley` generated most of the code in `Source/`.
 6. An `evaluate()` method was manually added to the generated [Cmd.rogue](Source/Cmd.rogue).
-7. [DaysValue.rogue](Source/DaysValue.rogue) and [[Source/Resolver.rogue]] were manually added.
+7. [DaysValue.rogue](Source/DaysValue.rogue) and [Resolver.rogue](Source/Resolver.rogue) were manually added.
 8. [Days.rogue](Source/Days.rogue) was modified to resolve the parsed input and print out appropriate results.
 

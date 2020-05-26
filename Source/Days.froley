@@ -27,12 +27,9 @@ YESTERDAY yesterday
 HELP help
 
 [symbols]
-SYMBOL_ASTERISK             *
-SYMBOL_CARET                ^
 SYMBOL_CLOSE_PAREN          )
 SYMBOL_COMMA                ,
 SYMBOL_DOT                  .
-SYMBOL_EQUALS               =
 SYMBOL_MINUS                -
 SYMBOL_OPEN_PAREN           (
 SYMBOL_PLUS                 +
@@ -126,17 +123,17 @@ return
 
 + term
   on INTEGER
-    if (consume(YEARS))   produce IntervalYears( value=t.content:Int32 )
-    if (consume(MONTHS))  produce IntervalMonths( value=t.content:Int32 )
-    if (consume(WEEKS))   produce IntervalWeeks( value=t.content:Int32 )
-    if (consume(DAYS))    produce IntervalDays( value=t.content:Int32 )
-    if (nextIs(MONTH))    create Day( value=t.content:Int32 ); day_month_year; return
+    if (consume(YEARS))   produce IntervalYears( value=t:Int32 )
+    if (consume(MONTHS))  produce IntervalMonths( value=t:Int32 )
+    if (consume(WEEKS))   produce IntervalWeeks( value=t:Int32 )
+    if (consume(DAYS))    produce IntervalDays( value=t:Int32 )
+    if (nextIs(MONTH))    create Day( value=t:Int32 ); day_month_year; return
     if (consume('-'))     create Month(value=t:Int32); month_day_year_hyphens; return
     if (consume('/'))     create Month(value=t:Int32); month_day_year_slashes; return
     if (consume('.'))     create Month(value=t:Int32); month_day_year_dots; return
-    produce IntervalDays( value=t.content:Int32 )
+    produce IntervalDays( value=t:Int32 )
   endOn
-  on MONTH: create Month( value=t.content:Int32 ); month_day_year; return
+  on MONTH: create Month( value=t:Int32 ); month_day_year; return
   on TODAY      -> Today
   on YESTERDAY  -> Yesterday
   on TOMORROW   -> Tomorrow
@@ -146,17 +143,17 @@ return
 
 - month_day_year
   on INTEGER
-    create Day( value=t.content:Int32 )
+    create Day( value=t:Int32 )
     if (consume ',')
       on INTEGER
-        create Year( value=t.content:Int32 )
+        create Year( value=t:Int32 )
         produce MDY( month, day, year )
       else
         syntaxError "Integer year expected."
       endOn
     else
       on INTEGER
-        create Year( value=t.content:Int32 )
+        create Year( value=t:Int32 )
         produce MDY( month, day, year )
       else
         produce MD( month, day )
@@ -166,9 +163,9 @@ return
 
 - day_month_year
   consume MONTH
-  create Month( value=t.content:Int32 )
+  create Month( value=t:Int32 )
   on INTEGER
-    create Year( value=t.content:Int32 )
+    create Year( value=t:Int32 )
     produce DMY( day, month, year )
   else
     produce DM( day, month )

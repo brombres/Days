@@ -2,7 +2,7 @@
 Command line utility to compute dates and intervals.
 
 ## Version
-- v2.0 - May 25, 2020
+- v2.1 - June 1, 2020
 - macOS, Linux, Windows
 - [MIT License](LICENSE)
 - By Abe Pralle

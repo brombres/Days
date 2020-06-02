@@ -41,6 +41,7 @@ Command line utility to compute dates and intervals.
       12.1.2020 / 2020.12.1
       12-1-2020 / 2020-12-1
       12/1/2020 / 2020/12/1
+      12.1 / 12-1 / 12/1
       today / tomorrow / yesterday
       1 / 1d / 1 day / 2 days
       1w / 1 week / 2 weeks

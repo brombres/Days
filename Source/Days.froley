@@ -174,33 +174,41 @@ return
 - month_day_year_hyphens
   on INTEGER
     create Day(value=t:Int32)
-    mustConsume '-'
-    on INTEGER
-      create Year(value=t:Int32)
-      produce MDYOrYMD( month, day, year )
-    endOn
+    if (consume('-'))
+      on INTEGER
+        create Year(value=t:Int32)
+        produce MDYOrYMD( month, day, year )
+      endOn
+    else
+      produce MD( month, day )
+    endIf
   endOn
   syntaxError "Integer date expected."
 
 - month_day_year_slashes
   on INTEGER
     create Day(value=t:Int32)
-    mustConsume '/'
-    on INTEGER
-      create Year(value=t:Int32)
-      produce MDYOrYMD( month, day, year )
-    endOn
+    if (consume('/'))
+      on INTEGER
+        create Year(value=t:Int32)
+        produce MDYOrYMD( month, day, year )
+      endOn
+    else
+      produce MD( month, day )
+    endIf
   endOn
   syntaxError "Integer date expected."
 
 - month_day_year_dots
   on INTEGER
     create Day(value=t:Int32)
-    mustConsume '.'
-    on INTEGER
-      create Year(value=t:Int32)
-      produce MDYOrYMD( month, day, year )
-    endOn
+    if (consume('.'))
+      on INTEGER
+        create Year(value=t:Int32)
+        produce MDYOrYMD( month, day, year )
+      endOn
+    else
+      produce MD( month, day )
+    endIf
   endOn
   syntaxError "Integer date expected."
-

@@ -170,12 +170,11 @@ routine rogo_publish( new_version="":String )
   block file = File( "Source/Days.rogue" )
     local content = file.load_as_string
     if (not String.exists(new_version))
-      local version = content.extract_string( ''*define VERSION "$"*'' ).split('.')
+      local version = content.extract_string( ''*define VERSION_INFO "v$"*'' ).before_first(' ').split('.')
       version.last = (version.last->Int32 + 1)->String
       new_version = version.join('.')
     endIf
-    content = content.replacing_pattern( ''define VERSION "$"'', ''define VERSION "$"''(new_version) )
-    content = content.replacing_pattern( ''define DATE "$"'', ''define DATE "$"''(new_date) )
+    content = content.replacing_pattern( ''define VERSION_INFO "$"'', ''define VERSION_INFO "v$ - $ by Abe Pralle"''(new_version,new_date) )
     file.save( content )
   endBlock
 

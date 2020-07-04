@@ -198,10 +198,6 @@ routine rogo_publish( new_version="":String )
 
   execute ''git commit -am "v$"'' (new_version)
   execute @|git push
-           |git checkout master
-           |git pull
-           |git merge develop
-           |git push
   execute "git tag $ && git push --tags" (new_version)
   execute @|git checkout develop
 

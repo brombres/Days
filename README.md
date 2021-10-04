@@ -1,19 +1,18 @@
 # Days
 Command line utility to compute dates and intervals.
 
-## Version
-- v2.2 - July 4, 2020
-- macOS, Linux, Windows
-- [MIT License](LICENSE)
-- By Abe Pralle
+About     | Current Release
+----------|-----------------------
+Version   | 2.2.1
+Date      | 2021.10.03
+Platforms | Windows, macOS, Linux
 
-## Installation
-1. Install the [Rogue](https://github.com/AbePralle/Rogue) language.
-2. Run `rogo` in this folder to compile Days.
-    - On macOS and Linux a launcher will be created here: `/usr/local/bin/days`.
-    - On Windows the build process will print the necessary folder to add to the system PATH environment variable.
+# Installation
 
-## Usage By Example
+1. Install [morlock](https://morlock.sh).
+2. `morlock install abepralle/days`
+
+# Usage By Example
 
     Console> days
     Enter h or ? for help.
@@ -68,7 +67,7 @@ Command line utility to compute dates and intervals.
     Console> days dec 31 - jan 1
     365 days
 
-## Development Notes
+# Development Notes
 
 1. *Days* was developed using the [Froley](https://github.com/AbePralle/Froley) parser generator.
 2. `rogo --create --project=Days` was used to set up the project. The "main file", `Source/Days.rogue`, was then deleted so that Froley would generate a new parser wrapper in its place.

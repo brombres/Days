@@ -1,6 +1,7 @@
 module Days
 
-$define VERSION_INFO "v2.2 - July 4, 2020 by Abe Pralle"
+$define VERSION "Days v2.2.1"
+$define AUTHOR  "October 3, 2021 by Abe Pralle"
 
 $requireRogue "1.7.3"
 

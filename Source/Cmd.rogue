@@ -379,18 +379,18 @@ class Help : Cmd
     method evaluate->DaysValue
       println @|Days Calculator
                |
-      println VERSION_INFO
+      println VERSION
+      println AUTHOR
       println @|
                |USAGE
                |  days              # Interactive mode
                |  days <command>    # Runs computation and displays results
                |
-               |
                |COMMANDS
-               |  <Date>                - Gives days since or until the given date.
-               |  <Date> +/- <Interval> - Reports the computed date.
-               |  <Date> - <Date>       - Gives elapsed number of days between the two dates.
-               |  q                     - Quit
+               |  <Date>                # Gives days since or until the given date.
+               |  <Date> +/- <Interval> # Reports the computed date.
+               |  <Date> - <Date>       # Gives elapsed number of days between the two dates.
+               |  q                     # Quit
                |
                |DATE AND INTERVAL FORMATS
                |  January 1, 2020
@@ -404,6 +404,12 @@ class Help : Cmd
                |  1w / 1 week / 2 weeks
                |  1m / 1 mo / 1 month / 2 months
                |  1y / 1 year / 2 years
+               |
+               |EXAMPLES
+               |  > days today              # Prints today's date
+               |  > days today - oct 3 2021 # Days since this example was written
+               |  > days jan 1              # Days since New Year
+               |  > days today + 4 weeks    # The date 4 weeks from now
       return DaysValue( null, null )
 
     method write( builder:StringBuilder )

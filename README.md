@@ -3,14 +3,14 @@ Command line utility to compute dates and intervals.
 
 About     | Current Release
 ----------|-----------------------
-Version   | 2.2.1
-Date      | 2021.10.03
+Version   | 3.0
+Date      | March 8, 2023
 Platforms | Windows, macOS, Linux
 
 # Installation
 
 1. Install [morlock](https://morlock.sh).
-2. `morlock install abepralle/days`
+2. `morlock install brombres/days`
 
 # Usage By Example
 
@@ -20,7 +20,7 @@ Platforms | Windows, macOS, Linux
     > ?
     Days Calculator
 
-    v2.0 - May 25, 2020 by Abe Pralle
+    v3.0 - March 8, 2023 by Brom Bresenham
 
     USAGE
       days              # Interactive mode
@@ -69,12 +69,12 @@ Platforms | Windows, macOS, Linux
 
 # Development Notes
 
-1. *Days* was developed using the [Froley](https://github.com/AbePralle/Froley) parser generator.
+1. *Days* was developed using the [Froley](https://github.com/brombres/Froley) parser generator.
 2. `rogo --create --project=Days` was used to set up the project. The "main file", `Source/Days.rogue`, was then deleted so that Froley would generate a new parser wrapper in its place.
 3. The [Days.froley](Source/Days.froley) tokenizer and parser definition file was copied from Froley's "Simple" example and modified.
 4. The Froley compile command (to generate Rogue parser classes from `Days.froley`) was added to [Build.rogue](Build.rogue).
 5. `rogo froley` generated most of the code in `Source/`.
-6. An `evaluate()` method was manually added to the generated [Cmd.rogue](Source/Cmd.rogue).
+6. An `evaluate()` method was manually added to the generated Cmd nodes in [CmdEval.rogue](Source/CmdEval.rogue).
 7. [DaysValue.rogue](Source/DaysValue.rogue) and [Resolver.rogue](Source/Resolver.rogue) were manually added.
 8. [Days.rogue](Source/Days.rogue) was modified to resolve the parsed input and print out appropriate results.
 

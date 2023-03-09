@@ -1,10 +1,8 @@
 module Days
 
-$include "ParserVM.rogue"
+$include "ParserCore.rogue"
 
-class Parser : ParserVM
+class Parser : ParserCore
   METHODS
-    method init
-      load( Code.parser_code )
 endClass
 

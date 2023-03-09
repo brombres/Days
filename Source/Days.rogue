@@ -1,40 +1,25 @@
 module Days
 
-$define VERSION "Days v2.2.1"
-$define AUTHOR  "October 3, 2021 by Abe Pralle"
+$define VERSION "2.2.1"
+$define DATE    "October 3, 2021"
 
-$requireRogue "1.7.3"
+$requireRogue "2"
 
+$include "CmdEval.rogue"
 $include "DaysValue.rogue"
 $include "Parser.rogue"
 $include "Resolver.rogue"
+$include "Scanner.rogue"
+$include "Token.rogue"
 
 Days()
 
 class Days
   METHODS
     method init
-      # Parse input or file by repeatedly calling first method defined in parser.
-      local parser = Parser()
       if (System.command_line_arguments.count)
-        try
-          local args = System.command_line_arguments.join( " " )
-          if (File.exists(args))
-            # Parse contents of file
-            parser.open( File(args) )
-          else
-            parser.open( "[Command Line]", args )
-          endIf
-
-          if (not parser.methods.is_empty)
-            while (parser.has_another)
-              print_results( parser.parse(parser.methods[0]) )
-            endWhile
-          endIf
-        catch (err:Error)
-          Console.error.println err
-        endTry
-
+        # Use command line args
+        print_results( Parser("[Command Line]",System.command_line_arguments.join(' ')).parse )
       else
         # Interactive mode
         println "Enter h or ? for help."
@@ -42,12 +27,7 @@ class Days
           try
             local input = Console.input( "> " )
             if (input == "q") escapeLoop
-            parser.open( "[Command Line]", input )
-            if (not parser.methods.is_empty)
-              while (parser.has_another)
-                print_results( parser.parse(parser.methods[0]) )
-              endWhile
-            endIf
+            print_results( Parser("[Command Line]",input).parse )
           catch (err:Error)
             Console.error.println err
           endTry
@@ -55,7 +35,9 @@ class Days
       endIf
 
     method print_results( cmd:Cmd )
-      cmd = Resolver().resolve( cmd )
+      if (not cmd) return
+
+      cmd = Resolver().visit( cmd )
       if (cmd instanceOf MDY)
         local date = cmd.evaluate.date.value
         if (date > Date.today)

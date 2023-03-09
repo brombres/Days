@@ -1,417 +1,462 @@
+# Generated and updated by Froley. Custom changes will not be overwritten; customize as desired.
 module Days
 
-class Cmd
-  PROPERTIES
-    t : Token
+class Cmd( t:Token )
+  GLOBAL METHODS
+    method to_character( st:String )->Character
+      if (st is null or st.count == 0) return Character(0)
+      return st[0]
 
   METHODS
-    method init( t, args:CmdInitArgs )
-      args.require_count( 0 )
+    method init( existing:Cmd )
+      t = existing.t
 
-    method dispatch( visitor:Visitor )->Cmd [propagated]
-      return visitor.visit( this )
+    method cloned->ThisType [propagated]
+      return ThisType(this)
 
-    method evaluate->DaysValue
+    method add( cmd:Cmd )
+      throw UnsupportedOperationError()
+
+    method clear
+      throw UnsupportedOperationError()
+
+    method count->Int32
+      return 0
+
+    method description->String
+      return "Cmd"
+
+    method dispatch<<$m,$VisitorType>>( visitor:$VisitorType )  [propagated]
+      visitor.$m( this )
+
+    method dispatch<<$m,$VisitorType,$ReturnType>>( visitor:$VisitorType )->$ReturnType [propagated]
+      return visitor.$m( this )
+
+    method first->Cmd
+      throw UnsupportedOperationError()
+
+    method get( index:Int32 )->Cmd
+      throw UnsupportedOperationError()
+
+    method get<<$AsType>>( index:Int32 )->$AsType
+      return get(index)->(as $AsType)
+
+    method insert( element:Cmd, before_index=0:Int32 )
+      throw UnsupportedOperationError()
+
+    method last->Cmd
+      throw UnsupportedOperationError()
+
+    method remove_first->Cmd
+      throw UnsupportedOperationError()
+
+    method remove_last->Cmd
+      throw UnsupportedOperationError()
+
+    method set( index:Int32, value:Cmd )
+      throw UnsupportedOperationError()
+
+    method to->Character
+      return Character(this->Int32)
+
+    method to->Cmd[]
       throw UnsupportedOperationError()
 
     method to->Int32
-      throw UnsupportedOperationError()
+      return 0
+
+    method to->Logical
+      return (this->Int32)?
+
+    method to->Real64
+      return this->Int32
 
     method to->String
-      local result = StringBuilder()
-      write( result )
-      return result->String
+      return description
 
-    method write( builder:StringBuilder )
-      builder.print( type_name.after_any("Cmd") )
-
-    method write( cmd:Cmd, builder:StringBuilder )
-      if (cmd) cmd.write( builder )
-      else      builder.print( "null" )
+    method to->Token[]
+      throw UnsupportedOperationError()
 endClass
 
 class CmdList : Cmd
   PROPERTIES
-    list : Cmd[]
+    list = Cmd[]
 
   METHODS
     method init( t )
-      list = Cmd[](5)
+      noAction
 
-    method init( t, args:CmdInitArgs )
-      list = Cmd[]( args.count )
-      list.add( forEach in args )
+    method init( t, element:Cmd )
+      list.add( element )
+
+    method init( t, element1:Cmd, element2:Cmd )
+      list.add( element1 )
+      list.add( element2 )
+
+    method init( existing:CmdList )
+      prior.init( existing )
+
+      # Start with shallow clone
+      list = existing.list.cloned
+
+      # Turn into deep clone
+      localize list
+      forEach (cmd at i in list)
+        if (cmd) list[i] = cmd.cloned
+      endForEach
+
+    method add( cmd:Cmd )
+      @list.add( cmd )
+
+    method clear
+      @list.clear
 
     method count->Int32
-      return list.count
+      return @list.count
+
+    method description->String
+      return "CmdList" + list_description
 
     method first->Cmd
-      return list.first
+      return @list.first
 
     method get( index:Int32 )->Cmd
-      return list[ index ]
+      return @list[index]
+
+    method insert( element:Cmd, before_index=0:Int32 )
+      list.insert( element, before_index )
 
     method last->Cmd
-      return list.last
+      return @list.last
 
-    method set( index:Int32, value:Cmd )->this
-      list[ index ] = value
-      return this
-
-    method write( builder:StringBuilder )
-      builder.print( '[' )
-      forEach (arg at index in list)
-        if (index > 0) builder.print( ',' )
-        write( arg, builder )
+    method list_description->String
+      local builder = String()
+      builder.print '['
+      forEach (element at index in @list)
+        if (index > 0) builder.print ','
+        builder.print( %element )
       endForEach
-      builder.print( ']' )
+      builder.print ']'
+      return builder
+
+    method remove_first->Cmd
+      return @list.remove_first
+
+    method remove_last->Cmd
+      return @list.remove_last
+
+    method set( index:Int32, value:Cmd )
+      @list[index] = value
+
+    method to->Cmd[]
+      return @list
+
 endClass
 
-class Statements : CmdList
+class TokenList : Cmd
+  PROPERTIES
+    tokens : Token[]
+
   METHODS
-    method write( builder:StringBuilder )
-      forEach (statement in list)
-        write( statement, builder )
-        builder.println
-      endForEach
+    method init( t )
+      tokens = Token[]
+
+    method init( t, tokens )
+
+    method init( existing:TokenList )
+      tokens = existing.tokens.cloned
+
+    method description->String
+      return "TokenList($)"(tokens)
+
+    method to->Token[]
+      return tokens
 endClass
 
 class Unary( t, operand:Cmd ) : Cmd
   METHODS
-    method init( t, args:CmdInitArgs )
-      args.require_count( 1 )
-      operand = args.first
+    method init( existing:Unary )
+      prior.init( existing )
+      operand = existing.operand.cloned
 
-    method op->String
-      throw UnsupportedOperationError()
-
-    method write( builder:StringBuilder )
-      builder.print( '(' ).print( op )
-      write( operand, builder )
-      builder.print( ')' )
-endClass
-
-class PostUnary : Unary
-  METHODS
-    method write( builder:StringBuilder )
-      builder.print( '(' )
-      write( operand, builder )
-      builder.print( op ).print( ')' )
+    method description->String
+      return "Unary($)"(%operand)
 endClass
 
 class Binary( t, left:Cmd, right:Cmd ) : Cmd
   METHODS
-    method init( t, args:CmdInitArgs )
-      args.require_count( 2 )
-      left = args.first
-      right = args.last
+    method init( existing:Binary )
+      prior.init( existing )
+      left = existing.left.cloned
+      right = existing.right.cloned
 
-    method op->String
-      throw UnsupportedOperationError()
-
-    method write( builder:StringBuilder )
-      builder.print( '(' )
-      write( left, builder )
-      builder.print( ' ' ).print( op ).print( ' ' )
-      write( right, builder )
-      builder.print( ')' )
+    method description->String
+      return "Binary($,$)"(%left,%right)
 endClass
 
 class Add : Binary
   METHODS
-    method evaluate->DaysValue
-      local left = left.evaluate
-      local right = right.evaluate
-      if (left.date and right.date)
-        throw t.error( "Expected Date + Interval, Interval + Date, or Interval + Interval." )
-      endIf
-      return left + right
+    method description->String
+      return "Add($,$)" (%left,%right)
 
-    method op->String
-      return "+"
+endClass
+
+class DM : Cmd
+  PROPERTIES
+    day   : Cmd
+    month : Cmd
+
+  METHODS
+    method init( t, day, month )
+
+    method init( existing:DM )
+      prior.init( existing )
+      if (existing.day) day = existing.day.cloned
+      if (existing.month) month = existing.month.cloned
+
+    method description->String
+      return "DM($,$)" (%day,%month)
+
+endClass
+
+class DMY : Cmd
+  PROPERTIES
+    day   : Cmd
+    month : Cmd
+    year  : Cmd
+
+  METHODS
+    method init( t, day, month, year )
+
+    method init( existing:DMY )
+      prior.init( existing )
+      if (existing.day) day = existing.day.cloned
+      if (existing.month) month = existing.month.cloned
+      if (existing.year) year = existing.year.cloned
+
+    method description->String
+      return "DMY($,$,$)" (%day,%month,%year)
+
+endClass
+
+class Day : Cmd
+  PROPERTIES
+    value : Int32
+
+  METHODS
+    method init( t, value )
+
+    method init( existing:Day )
+      prior.init( existing )
+      value = existing.value
+
+    method description->String
+      return "Day($)" (%value)
+
+    method to->Int32:     return value
+    method to->String:    return value
+
+endClass
+
+class Help : Cmd
+  METHODS
+    method description->String
+      return "Help"
+endClass
+
+class IntervalDays : Cmd
+  PROPERTIES
+    value : Int32
+
+  METHODS
+    method init( t, value )
+
+    method init( existing:IntervalDays )
+      prior.init( existing )
+      value = existing.value
+
+    method description->String
+      return "IntervalDays($)" (%value)
+
+    method to->Int32:     return value
+    method to->String:    return value
+
+endClass
+
+class IntervalMonths : Cmd
+  PROPERTIES
+    value : Int32
+
+  METHODS
+    method init( t, value )
+
+    method init( existing:IntervalMonths )
+      prior.init( existing )
+      value = existing.value
+
+    method description->String
+      return "IntervalMonths($)" (%value)
+
+    method to->Int32:     return value
+    method to->String:    return value
+
+endClass
+
+class IntervalWeeks : Cmd
+  PROPERTIES
+    value : Int32
+
+  METHODS
+    method init( t, value )
+
+    method init( existing:IntervalWeeks )
+      prior.init( existing )
+      value = existing.value
+
+    method description->String
+      return "IntervalWeeks($)" (%value)
+
+    method to->Int32:     return value
+    method to->String:    return value
+
+endClass
+
+class IntervalYears : Cmd
+  PROPERTIES
+    value : Int32
+
+  METHODS
+    method init( t, value )
+
+    method init( existing:IntervalYears )
+      prior.init( existing )
+      value = existing.value
+
+    method description->String
+      return "IntervalYears($)" (%value)
+
+    method to->Int32:     return value
+    method to->String:    return value
+
+endClass
+
+class MD : Cmd
+  PROPERTIES
+    month : Cmd
+    day   : Cmd
+
+  METHODS
+    method init( t, month, day )
+
+    method init( existing:MD )
+      prior.init( existing )
+      if (existing.month) month = existing.month.cloned
+      if (existing.day) day = existing.day.cloned
+
+    method description->String
+      return "MD($,$)" (%month,%day)
+
+endClass
+
+class MDY : Cmd
+  PROPERTIES
+    month : Cmd
+    day   : Cmd
+    year  : Cmd
+
+  METHODS
+    method init( t, month, day, year )
+
+    method init( existing:MDY )
+      prior.init( existing )
+      if (existing.month) month = existing.month.cloned
+      if (existing.day) day = existing.day.cloned
+      if (existing.year) year = existing.year.cloned
+
+    method description->String
+      return "MDY($,$,$)" (%month,%day,%year)
+
+endClass
+
+class MDYOrYMD : Cmd
+  PROPERTIES
+    month : Cmd
+    day   : Cmd
+    year  : Cmd
+
+  METHODS
+    method init( t, month, day, year )
+
+    method init( existing:MDYOrYMD )
+      prior.init( existing )
+      if (existing.month) month = existing.month.cloned
+      if (existing.day) day = existing.day.cloned
+      if (existing.year) year = existing.year.cloned
+
+    method description->String
+      return "MDYOrYMD($,$,$)" (%month,%day,%year)
+
+endClass
+
+class Month : Cmd
+  PROPERTIES
+    value : Int32
+
+  METHODS
+    method init( t, value )
+
+    method init( existing:Month )
+      prior.init( existing )
+      value = existing.value
+
+    method description->String
+      return "Month($)" (%value)
+
+    method to->Int32:     return value
+    method to->String:    return value
+
 endClass
 
 class Subtract : Binary
   METHODS
-    method evaluate->DaysValue
-      local left = left.evaluate
-      local right = right.evaluate
-      if (left.date)
-        return left - right
-      else
-        throw t.error( "Expected Date - Date or Date - Interval." )
-      endIf
+    method description->String
+      return "Subtract($,$)" (%left,%right)
 
-    method op->String
-      return "-"
 endClass
 
 class Today : Cmd
   METHODS
-    method evaluate->DaysValue
-      return DaysValue( Date.today )
-
-    method write( builder:StringBuilder )
-      builder.print( "today" )
+    method description->String
+      return "Today"
 endClass
 
-class IntervalDays( t, value:Int32 ) : Cmd
+class Tomorrow : Cmd
   METHODS
-    method init( t, args:CmdInitArgs )
-      args.require_count( 0 )
-      this.value = t.content->Int32
-
-    method evaluate->DaysValue
-      return DaysValue( DateInterval.days(value) )
-
-    method write( builder:StringBuilder )
-      builder.print( ""+value )
+    method description->String
+      return "Tomorrow"
 endClass
 
-class IntervalYears( t, value:Int32 ) : Cmd
+class Year : Cmd
+  PROPERTIES
+    value : Int32
+
   METHODS
-    method init( t, args:CmdInitArgs )
-      args.require_count( 0 )
-      this.value = t.content->Int32
+    method init( t, value )
 
-    method evaluate->DaysValue
-      return DaysValue( DateInterval.years(value) )
+    method init( existing:Year )
+      prior.init( existing )
+      value = existing.value
 
-    method write( builder:StringBuilder )
-      builder.print( ""+value )
-endClass
+    method description->String
+      return "Year($)" (%value)
 
-class IntervalMonths( t, value:Int32 ) : Cmd
-  METHODS
-    method init( t, args:CmdInitArgs )
-      args.require_count( 0 )
-      this.value = t.content->Int32
+    method to->Int32:     return value
+    method to->String:    return value
 
-    method evaluate->DaysValue
-      return DaysValue( DateInterval.months(value) )
-
-    method write( builder:StringBuilder )
-      builder.print( ""+value )
-endClass
-
-class IntervalWeeks( t, value:Int32 ) : Cmd
-  METHODS
-    method init( t, args:CmdInitArgs )
-      args.require_count( 0 )
-      this.value = t.content->Int32
-
-    method evaluate->DaysValue
-      return DaysValue( DateInterval.days(value*7) )
-
-    method write( builder:StringBuilder )
-      builder.print( ""+value )
-endClass
-
-class Day( t, value:Int32 ) : Cmd
-  METHODS
-    method init( t, args:CmdInitArgs )
-      args.require_count( 0 )
-      this.value = t.content->Int32
-
-    method to->Int32
-      return value
-
-    method write( builder:StringBuilder )
-      builder.print( ""+value )
-endClass
-
-class Year( t, value:Int32 ) : Cmd
-  METHODS
-    method init( t, args:CmdInitArgs )
-      args.require_count( 0 )
-      this.value = t.content->Int32
-
-    method to->Int32
-      return value
-
-    method write( builder:StringBuilder )
-      builder.print( ""+value )
-endClass
-
-class MDY( t, month:Cmd, day:Cmd, year:Cmd ) : Cmd
-  METHODS
-    method init( t, args:CmdInitArgs )
-      args.require_count( 3 )
-      this.month = args[ 0 ]
-      this.day = args[ 1 ]
-      this.year = args[ 2 ]
-
-    method evaluate->DaysValue
-      local y = year->Int32.clamped_low( 1 )
-      local m = month->Int32.clamped( 1, 12 )
-      local d = day->Int32.clamped( 1, Date.days_in_month(y,m) )
-      return DaysValue( Date(y,m,d) )
-
-    method write( builder:StringBuilder )
-      builder.print( "MDY(" )
-      write( month, builder )
-      builder.print( ',' )
-      write( day, builder )
-      builder.print( ',' )
-      write( year, builder )
-      builder.print( ')' )
-endClass
-
-class MD( t, month:Cmd, day:Cmd ) : Cmd
-  METHODS
-    method init( t, args:CmdInitArgs )
-      args.require_count( 2 )
-      this.month = args[ 0 ]
-      this.day = args[ 1 ]
-
-    method evaluate->DaysValue
-      local y = Date.today.year
-      local m = month->Int32.clamped( 1, 12 )
-      local d = day->Int32.clamped_low( 1 )
-      if (d >= 100)
-        # Interpret the day as the year - "May 2020"
-        y = d
-        d = 1
-      else
-        d = d.clamped_high( Date.days_in_month(y,m) )
-      endIf
-      return DaysValue( Date(y,m,d) )
-
-    method write( builder:StringBuilder )
-      builder.print( "MD(" )
-      write( month, builder )
-      builder.print( ',' )
-      write( day, builder )
-      builder.print( ')' )
-endClass
-
-class Month( t, value:Int32 ) : Cmd
-  METHODS
-    method init( t, args:CmdInitArgs )
-      args.require_count( 0 )
-      this.value = t.content->Int32
-
-    method evaluate->DaysValue
-      local m = value.clamped( 1, 12 )
-      return DaysValue( Date(Date.today.year,m,1) )
-
-    method to->Int32
-      return value
-
-    method write( builder:StringBuilder )
-      builder.print( ""+value )
-endClass
-
-
-class DMY( t, day:Cmd, month:Cmd, year:Cmd ) : Cmd
-  METHODS
-    method init( t, args:CmdInitArgs )
-      args.require_count( 3 )
-      this.day = args[ 0 ]
-      this.month = args[ 1 ]
-      this.year = args[ 2 ]
-
-    method write( builder:StringBuilder )
-      builder.print( "DMY(" )
-      write( day, builder )
-      builder.print( ',' )
-      write( month, builder )
-      builder.print( ',' )
-      write( year, builder )
-      builder.print( ')' )
-endClass
-
-class DM( t, day:Cmd, month:Cmd ) : Cmd
-  METHODS
-    method init( t, args:CmdInitArgs )
-      args.require_count( 2 )
-      this.day = args[ 0 ]
-      this.month = args[ 1 ]
-
-    method write( builder:StringBuilder )
-      builder.print( "DM(" )
-      write( day, builder )
-      builder.print( ',' )
-      write( month, builder )
-      builder.print( ')' )
-endClass
-
-class MDYOrYMD( t, month:Cmd, day:Cmd, year:Cmd ) : Cmd
-  METHODS
-    method init( t, args:CmdInitArgs )
-      args.require_count( 3 )
-      this.month = args[ 0 ]
-      this.day = args[ 1 ]
-      this.year = args[ 2 ]
-
-    method write( builder:StringBuilder )
-      builder.print( "MDYorYMD(" )
-      write( month, builder )
-      builder.print( ',' )
-      write( day, builder )
-      builder.print( ',' )
-      write( year, builder )
-      builder.print( ')' )
 endClass
 
 class Yesterday : Cmd
   METHODS
-    method evaluate->DaysValue
-      return DaysValue( Date.today - 1 )
-
-    method write( builder:StringBuilder )
-      builder.print( "yesterday" )
-endClass
-
-
-class Tomorrow : Cmd
-  METHODS
-    method evaluate->DaysValue
-      return DaysValue( Date.today + 1 )
-
-    method write( builder:StringBuilder )
-      builder.print( "tomorrow" )
-endClass
-
-
-class Help : Cmd
-  METHODS
-    method evaluate->DaysValue
-      println @|Days Calculator
-               |
-      println VERSION
-      println AUTHOR
-      println @|
-               |USAGE
-               |  days              # Interactive mode
-               |  days <command>    # Runs computation and displays results
-               |
-               |COMMANDS
-               |  <Date>                # Gives days since or until the given date.
-               |  <Date> +/- <Interval> # Reports the computed date.
-               |  <Date> - <Date>       # Gives elapsed number of days between the two dates.
-               |  q                     # Quit
-               |
-               |DATE AND INTERVAL FORMATS
-               |  January 1, 2020
-               |  JAN 1 2020           # Case-insensitive month names
-               |  1 jan 2020
-               |  12.1.2020 / 2020.12.1
-               |  12-1-2020 / 2020-12-1
-               |  12/1/2020 / 2020/12/1
-               |  today / tomorrow / yesterday
-               |  1 / 1d / 1 day / 2 days
-               |  1w / 1 week / 2 weeks
-               |  1m / 1 mo / 1 month / 2 months
-               |  1y / 1 year / 2 years
-               |
-               |EXAMPLES
-               |  > days today              # Prints today's date
-               |  > days today - oct 3 2021 # Days since this example was written
-               |  > days jan 1              # Days since New Year
-               |  > days today + 4 weeks    # The date 4 weeks from now
-      return DaysValue( null, null )
-
-    method write( builder:StringBuilder )
-      builder.print( "help" )
+    method description->String
+      return "Yesterday"
 endClass

@@ -1,20 +1,13 @@
-[settings]
-id_start    alpha '_'
-id_continue alpha numeric '_'
-
-[whitespace]
-SPACE ' '
-TAB   '\t'
-EOL   '\n'
-CR    '\r'
-
-[tokens]
+--------------------------------------------------------------------------------
+tokens
+--------------------------------------------------------------------------------
 IDENTIFIER identifier [content]
 INTEGER    integer    [content]
 MONTH      month      [content]
 
-[keywords]
-
+--------------------------------------------------------------------------------
+tokens Keywords
+--------------------------------------------------------------------------------
 DAYS   days
 MONTHS months
 WEEKS  weeks
@@ -26,7 +19,9 @@ YESTERDAY yesterday
 
 HELP help
 
-[symbols]
+--------------------------------------------------------------------------------
+tokens Symbols
+--------------------------------------------------------------------------------
 SYMBOL_CLOSE_PAREN          )
 SYMBOL_COMMA                ,
 SYMBOL_DOT                  .
@@ -35,105 +30,117 @@ SYMBOL_OPEN_PAREN           (
 SYMBOL_PLUS                 +
 SYMBOL_SLASH                /
 
-[tokenizer]
-<<tokenize>>
-which (input)
-  discardAny [whitespace]
-endWhich
+--------------------------------------------------------------------------------
+scanner
+--------------------------------------------------------------------------------
+- tokenize
+  consume_whitespace
+  markPosition
+  if (not hasAnother) halt
 
-<whitespace_consumed>
-markSourcePosition
-if (not hasAnother) halt
+  scan_identifier
+  scan_symbol
 
-if (scanIdentifier)
-  which (buffer)
-    produceAny [keywords]
-    # Tilde is used for case-insensitive comparisons
-    case ~"January":   clear buffer; collect "1"; produce MONTH
-    case ~"February":  clear buffer; collect "2"; produce MONTH
-    case ~"March":     clear buffer; collect "3"; produce MONTH
-    case ~"April":     clear buffer; collect "4"; produce MONTH
-    case ~"May":       clear buffer; collect "5"; produce MONTH
-    case ~"June":      clear buffer; collect "6"; produce MONTH
-    case ~"July":      clear buffer; collect "7"; produce MONTH
-    case ~"August":    clear buffer; collect "8"; produce MONTH
-    case ~"September": clear buffer; collect "9"; produce MONTH
-    case ~"October":   clear buffer; collect "10"; produce MONTH
-    case ~"November":  clear buffer; collect "11"; produce MONTH
-    case ~"December":  clear buffer; collect "12"; produce MONTH
-    case ~"Jan":       clear buffer; collect "1"; produce MONTH
-    case ~"Feb":       clear buffer; collect "2"; produce MONTH
-    case ~"Mar":       clear buffer; collect "3"; produce MONTH
-    case ~"Apr":       clear buffer; collect "4"; produce MONTH
-    case ~"Jun":       clear buffer; collect "6"; produce MONTH
-    case ~"Jul":       clear buffer; collect "7"; produce MONTH
-    case ~"Aug":       clear buffer; collect "8"; produce MONTH
-    case ~"Sep":       clear buffer; collect "9"; produce MONTH
-    case ~"Oct":       clear buffer; collect "10"; produce MONTH
-    case ~"Nov":       clear buffer; collect "11"; produce MONTH
-    case ~"Dec":       clear buffer; collect "12"; produce MONTH
-    case "day":        produce DAYS
-    case "month":      produce MONTHS
-    case "week":       produce WEEKS
-    case "year":       produce YEARS
-    case "d":          produce DAYS
-    case "m":          produce MONTHS
-    case "w":          produce WEEKS
-    case "y":          produce YEARS
-    case "mo":         produce MONTHS
-    case "wk":         produce WEEKS
-    case "h":          produce HELP
-    others: produce IDENTIFIER
-  endWhich
-endIf
+  syntaxError
 
-which (input)
-  produceAny [symbols]
-  case '?': produce HELP
-  case '#'
-    # Single-line comment
-    ch = read
-    while (ch != '\n') ch = read
-    discard
-  others
-    ch = peek
-    if (ch is digit)
-      scan_integer
-      produce INTEGER
-    endIf
-endWhich
+- consume_whitespace
+  while (consume(' ') or consume('\t') or consume('\n') or consume('\r')) noAction
+  return
 
-syntaxError
-
-<scan_integer>
-while (ch is digit or ch == '_')
-  ch = read
-  if (ch != '_') collect ch
-  if (not hasAnother) return
+- scan_identifier
   ch = peek
-endWhile
-return
+  if (scan [a-zA-Z_][a-zA-Z0-9_]*)
+    match (buffer)
+      produceAny Keywords
 
-[parser]
+      # Tilde is used for case-insensitive comparisons
+      case ~"January":   buffer=""; collect "1";  produce MONTH
+      case ~"February":  buffer=""; collect "2";  produce MONTH
+      case ~"March":     buffer=""; collect "3";  produce MONTH
+      case ~"April":     buffer=""; collect "4";  produce MONTH
+      case ~"May":       buffer=""; collect "5";  produce MONTH
+      case ~"June":      buffer=""; collect "6";  produce MONTH
+      case ~"July":      buffer=""; collect "7";  produce MONTH
+      case ~"August":    buffer=""; collect "8";  produce MONTH
+      case ~"September": buffer=""; collect "9";  produce MONTH
+      case ~"October":   buffer=""; collect "10"; produce MONTH
+      case ~"November":  buffer=""; collect "11"; produce MONTH
+      case ~"December":  buffer=""; collect "12"; produce MONTH
+      case ~"Jan":       buffer=""; collect "1";  produce MONTH
+      case ~"Feb":       buffer=""; collect "2";  produce MONTH
+      case ~"Mar":       buffer=""; collect "3";  produce MONTH
+      case ~"Apr":       buffer=""; collect "4";  produce MONTH
+      case ~"Jun":       buffer=""; collect "6";  produce MONTH
+      case ~"Jul":       buffer=""; collect "7";  produce MONTH
+      case ~"Aug":       buffer=""; collect "8";  produce MONTH
+      case ~"Sep":       buffer=""; collect "9";  produce MONTH
+      case ~"Oct":       buffer=""; collect "10"; produce MONTH
+      case ~"Nov":       buffer=""; collect "11"; produce MONTH
+      case ~"Dec":       buffer=""; collect "12"; produce MONTH
+      case "day":        produce DAYS
+      case "month":      produce MONTHS
+      case "week":       produce WEEKS
+      case "year":       produce YEARS
+      case "d":          produce DAYS
+      case "m":          produce MONTHS
+      case "w":          produce WEEKS
+      case "y":          produce YEARS
+      case "mo":         produce MONTHS
+      case "wk":         produce WEEKS
+      case "h":          produce HELP
+      others:            produce IDENTIFIER
+    endMatch
+  endIf
+  return
+
+- scan_symbol
+  match input
+    produceAny Symbols
+    case '?': produce HELP
+    case '#'
+      # Single-line comment
+      ch = read
+      while (ch != '\n') ch = read
+      restart
+    others
+      if (nextIs [0-9])
+        scan_integer
+        produce INTEGER
+      endIf
+  endMatch
+
+- scan_integer
+  while (nextIs [0-9_])
+    ch = read
+    if (ch != '_') collect ch
+    if (not hasAnother) return
+    ch = peek
+  endWhile
+  return
+
+--------------------------------------------------------------------------------
+parser
+--------------------------------------------------------------------------------
 - expression
+  add_subtract
 
-+ add_subtract : BinaryParseRule
+- add_subtract [binary]
   on "+" -> Add
   on "-" -> Subtract
 
-+ term
+- term
   on INTEGER
-    if (consume(YEARS))   produce IntervalYears( value=t:Int32 )
-    if (consume(MONTHS))  produce IntervalMonths( value=t:Int32 )
-    if (consume(WEEKS))   produce IntervalWeeks( value=t:Int32 )
-    if (consume(DAYS))    produce IntervalDays( value=t:Int32 )
-    if (nextIs(MONTH))    create Day( value=t:Int32 ); day_month_year; return
-    if (consume('-'))     create Month(value=t:Int32); month_day_year_hyphens; return
-    if (consume('/'))     create Month(value=t:Int32); month_day_year_slashes; return
-    if (consume('.'))     create Month(value=t:Int32); month_day_year_dots; return
-    produce IntervalDays( value=t:Int32 )
+    if (consume(YEARS))   produce IntervalYears( value=content:Integer )
+    if (consume(MONTHS))  produce IntervalMonths( value=content:Integer )
+    if (consume(WEEKS))   produce IntervalWeeks( value=content:Integer )
+    if (consume(DAYS))    produce IntervalDays( value=content:Integer )
+    if (nextIs(MONTH))    create Day( value=content:Integer ); day_month_year; return
+    if (consume('-'))     create Month(value=content:Integer); month_day_year_hyphens; return
+    if (consume('/'))     create Month(value=content:Integer); month_day_year_slashes; return
+    if (consume('.'))     create Month(value=content:Integer); month_day_year_dots; return
+    produce IntervalDays( value=content:Integer )
   endOn
-  on MONTH: create Month( value=t:Int32 ); month_day_year; return
+  on MONTH: create Month( value=content:Integer ); month_day_year; return
   on TODAY      -> Today
   on YESTERDAY  -> Yesterday
   on TOMORROW   -> Tomorrow
@@ -143,19 +150,19 @@ return
 
 - month_day_year
   on INTEGER
-    create Day( value=t:Int32 )
+    create Day( value=content:Integer )
     if (consume ',')
       on INTEGER
-        create Year( value=t:Int32 )
+        create Year( value=content:Integer )
         produce MDY( month, day, year )
-      else
+      elseOnOthers
         syntaxError "Integer year expected."
       endOn
     else
       on INTEGER
-        create Year( value=t:Int32 )
+        create Year( value=content:Integer )
         produce MDY( month, day, year )
-      else
+      elseOnOthers
         produce MD( month, day )
       endOn
     endIf
@@ -163,20 +170,20 @@ return
 
 - day_month_year
   consume MONTH
-  create Month( value=t:Int32 )
+  create Month( value=content:Integer )
   on INTEGER
-    create Year( value=t:Int32 )
+    create Year( value=content:Integer )
     produce DMY( day, month, year )
-  else
+  elseOnOthers
     produce DM( day, month )
   endOn
 
 - month_day_year_hyphens
   on INTEGER
-    create Day(value=t:Int32)
+    create Day(value=content:Integer)
     if (consume('-'))
       on INTEGER
-        create Year(value=t:Int32)
+        create Year(value=content:Integer)
         produce MDYOrYMD( month, day, year )
       endOn
     else
@@ -187,10 +194,10 @@ return
 
 - month_day_year_slashes
   on INTEGER
-    create Day(value=t:Int32)
+    create Day(value=content:Integer)
     if (consume('/'))
       on INTEGER
-        create Year(value=t:Int32)
+        create Year(value=content:Integer)
         produce MDYOrYMD( month, day, year )
       endOn
     else
@@ -201,10 +208,10 @@ return
 
 - month_day_year_dots
   on INTEGER
-    create Day(value=t:Int32)
+    create Day(value=content:Integer)
     if (consume('.'))
       on INTEGER
-        create Year(value=t:Int32)
+        create Year(value=content:Integer)
         produce MDYOrYMD( month, day, year )
       endOn
     else

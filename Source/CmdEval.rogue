@@ -1,0 +1,148 @@
+module Days
+
+augment Cmd
+  PROPERTIES
+    t : Token
+
+  METHODS
+    method evaluate->DaysValue
+      throw UnsupportedOperationError()
+endAugment
+
+augment Add
+  METHODS
+    method evaluate->DaysValue
+      local left = left.evaluate
+      local right = right.evaluate
+      if (left.date and right.date)
+        throw t.error( "Expected Date + Interval, Interval + Date, or Interval + Interval." )
+      endIf
+      return left + right
+endAugment
+
+augment Subtract
+  METHODS
+    method evaluate->DaysValue
+      local left = left.evaluate
+      local right = right.evaluate
+      if (left.date)
+        return left - right
+      else
+        throw t.error( "Expected Date - Date or Date - Interval." )
+      endIf
+endAugment
+
+augment Today
+  METHODS
+    method evaluate->DaysValue
+      return DaysValue( Date.today )
+endAugment
+
+augment IntervalDays
+  METHODS
+    method evaluate->DaysValue
+      return DaysValue( DateInterval.days(value) )
+endAugment
+
+augment IntervalYears
+  METHODS
+    method evaluate->DaysValue
+      return DaysValue( DateInterval.years(value) )
+endAugment
+
+augment IntervalMonths
+  METHODS
+    method evaluate->DaysValue
+      return DaysValue( DateInterval.months(value) )
+endAugment
+
+augment IntervalWeeks
+  METHODS
+    method evaluate->DaysValue
+      return DaysValue( DateInterval.days(value*7) )
+endAugment
+
+augment MDY
+  METHODS
+    method evaluate->DaysValue
+      local y = year->Int32.clamped_low( 1 )
+      local m = month->Int32.clamped( 1, 12 )
+      local d = day->Int32.clamped( 1, Date.days_in_month(y,m) )
+      return DaysValue( Date(y,m,d) )
+endAugment
+
+augment MD
+  METHODS
+    method evaluate->DaysValue
+      local y = Date.today.year
+      local m = month->Int32.clamped( 1, 12 )
+      local d = day->Int32.clamped_low( 1 )
+      if (d >= 100)
+        # Interpret the day as the year - "May 2020"
+        y = d
+        d = 1
+      else
+        d = d.clamped_high( Date.days_in_month(y,m) )
+      endIf
+      return DaysValue( Date(y,m,d) )
+endAugment
+
+augment Month
+  METHODS
+    method evaluate->DaysValue
+      local m = value.clamped( 1, 12 )
+      return DaysValue( Date(Date.today.year,m,1) )
+endAugment
+
+augment Yesterday
+  METHODS
+    method evaluate->DaysValue
+      return DaysValue( Date.today - 1 )
+endAugment
+
+
+augment Tomorrow
+  METHODS
+    method evaluate->DaysValue
+      return DaysValue( Date.today + 1 )
+endAugment
+
+
+augment Help
+  METHODS
+    method evaluate->DaysValue
+      println @|Days Calculator
+               |
+      println "Days v$" (VERSION)
+      println "$ by Brom Bresenham"(DATE)
+      println @|
+               |USAGE
+               |  days              # Interactive mode
+               |  days <command>    # Runs computation and displays results
+               |
+               |COMMANDS
+               |  <Date>                # Gives days since or until the given date.
+               |  <Date> +/- <Interval> # Reports the computed date.
+               |  <Date> - <Date>       # Gives elapsed number of days between the two dates.
+               |  q                     # Quit
+               |
+               |DATE AND INTERVAL FORMATS
+               |  January 1, 2020
+               |  JAN 1 2020           # Case-insensitive month names
+               |  1 jan 2020
+               |  12.1.2020 / 2020.12.1
+               |  12-1-2020 / 2020-12-1
+               |  12/1/2020 / 2020/12/1
+               |  today / tomorrow / yesterday
+               |  1 / 1d / 1 day / 2 days
+               |  1w / 1 week / 2 weeks
+               |  1m / 1 mo / 1 month / 2 months
+               |  1y / 1 year / 2 years
+               |
+               |EXAMPLES
+               |  > days today              # Prints today's date
+               |  > days today - oct 3 2021 # Days since this example was written
+               |  > days jan 1              # Days since New Year
+               |  > days today + 4 weeks    # The date 4 weeks from now
+      return DaysValue( null, null )
+endAugment

@@ -3,7 +3,7 @@ Command line utility to compute dates and intervals.
 
 About     | Current Release
 ----------|-----------------------
-Version   | 3.0
+Version   | 3.0.1
 Date      | March 8, 2023
 Platforms | Windows, macOS, Linux
 

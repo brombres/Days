@@ -1,4 +1,4 @@
-module Days
+library Days
 
 $define VERSION "2.2.1"
 $define DATE    "October 3, 2021"

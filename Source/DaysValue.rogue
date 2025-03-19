@@ -1,4 +1,4 @@
-module Days
+library Days
 
 class DaysValue( date:Date?, interval:DateInterval? ) [compound]
   GLOBAL METHODS

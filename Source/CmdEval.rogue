@@ -1,4 +1,4 @@
-module Days
+library Days
 
 augment Cmd
   PROPERTIES
@@ -65,9 +65,9 @@ endAugment
 augment MDY
   METHODS
     method evaluate->DaysValue
-      local y = year->Int32.clamped_low( 1 )
-      local m = month->Int32.clamped( 1, 12 )
-      local d = day->Int32.clamped( 1, Date.days_in_month(y,m) )
+      local y = year->Int.clamped_low( 1 )
+      local m = month->Int.clamped( 1, 12 )
+      local d = day->Int.clamped( 1, Date.days_in_month(y,m) )
       return DaysValue( Date(y,m,d) )
 endAugment
 
@@ -75,8 +75,8 @@ augment MD
   METHODS
     method evaluate->DaysValue
       local y = Date.today.year
-      local m = month->Int32.clamped( 1, 12 )
-      local d = day->Int32.clamped_low( 1 )
+      local m = month->Int.clamped( 1, 12 )
+      local d = day->Int.clamped_low( 1 )
       if (d >= 100)
         # Interpret the day as the year - "May 2020"
         y = d

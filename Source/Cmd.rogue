@@ -1,5 +1,5 @@
 # Generated and updated by Froley. Custom changes will not be overwritten; customize as desired.
-module Days
+library Days
 
 class Cmd( t:Token )
   GLOBAL METHODS
@@ -20,7 +20,7 @@ class Cmd( t:Token )
     method clear
       throw UnsupportedOperationError()
 
-    method count->Int32
+    method count->Int
       return 0
 
     method description->String
@@ -35,13 +35,13 @@ class Cmd( t:Token )
     method first->Cmd
       throw UnsupportedOperationError()
 
-    method get( index:Int32 )->Cmd
+    method get( index:Int )->Cmd
       throw UnsupportedOperationError()
 
-    method get<<$AsType>>( index:Int32 )->$AsType
+    method get<<$AsType>>( index:Int )->$AsType
       return get(index)->(as $AsType)
 
-    method insert( element:Cmd, before_index=0:Int32 )
+    method insert( element:Cmd, before_index=0:Int )
       throw UnsupportedOperationError()
 
     method last->Cmd
@@ -53,23 +53,23 @@ class Cmd( t:Token )
     method remove_last->Cmd
       throw UnsupportedOperationError()
 
-    method set( index:Int32, value:Cmd )
+    method set( index:Int, value:Cmd )
       throw UnsupportedOperationError()
 
     method to->Character
-      return Character(this->Int32)
+      return Character(this->Int)
 
     method to->Cmd[]
       throw UnsupportedOperationError()
 
-    method to->Int32
+    method to->Int
       return 0
 
     method to->Logical
-      return (this->Int32)?
+      return (this->Int)?
 
     method to->Real64
-      return this->Int32
+      return this->Int
 
     method to->String
       return description
@@ -111,7 +111,7 @@ class CmdList : Cmd
     method clear
       @list.clear
 
-    method count->Int32
+    method count->Int
       return @list.count
 
     method description->String
@@ -120,10 +120,10 @@ class CmdList : Cmd
     method first->Cmd
       return @list.first
 
-    method get( index:Int32 )->Cmd
+    method get( index:Int )->Cmd
       return @list[index]
 
-    method insert( element:Cmd, before_index=0:Int32 )
+    method insert( element:Cmd, before_index=0:Int )
       list.insert( element, before_index )
 
     method last->Cmd
@@ -145,7 +145,7 @@ class CmdList : Cmd
     method remove_last->Cmd
       return @list.remove_last
 
-    method set( index:Int32, value:Cmd )
+    method set( index:Int, value:Cmd )
       @list[index] = value
 
     method to->Cmd[]
@@ -241,7 +241,7 @@ endClass
 
 class Day : Cmd
   PROPERTIES
-    value : Int32
+    value : Int
 
   METHODS
     method init( t, value )
@@ -253,7 +253,7 @@ class Day : Cmd
     method description->String
       return "Day($)" (%value)
 
-    method to->Int32:     return value
+    method to->Int:     return value
     method to->String:    return value
 
 endClass
@@ -266,7 +266,7 @@ endClass
 
 class IntervalDays : Cmd
   PROPERTIES
-    value : Int32
+    value : Int
 
   METHODS
     method init( t, value )
@@ -278,14 +278,14 @@ class IntervalDays : Cmd
     method description->String
       return "IntervalDays($)" (%value)
 
-    method to->Int32:     return value
+    method to->Int:     return value
     method to->String:    return value
 
 endClass
 
 class IntervalMonths : Cmd
   PROPERTIES
-    value : Int32
+    value : Int
 
   METHODS
     method init( t, value )
@@ -297,14 +297,14 @@ class IntervalMonths : Cmd
     method description->String
       return "IntervalMonths($)" (%value)
 
-    method to->Int32:     return value
+    method to->Int:     return value
     method to->String:    return value
 
 endClass
 
 class IntervalWeeks : Cmd
   PROPERTIES
-    value : Int32
+    value : Int
 
   METHODS
     method init( t, value )
@@ -316,14 +316,14 @@ class IntervalWeeks : Cmd
     method description->String
       return "IntervalWeeks($)" (%value)
 
-    method to->Int32:     return value
+    method to->Int:     return value
     method to->String:    return value
 
 endClass
 
 class IntervalYears : Cmd
   PROPERTIES
-    value : Int32
+    value : Int
 
   METHODS
     method init( t, value )
@@ -335,7 +335,7 @@ class IntervalYears : Cmd
     method description->String
       return "IntervalYears($)" (%value)
 
-    method to->Int32:     return value
+    method to->Int:     return value
     method to->String:    return value
 
 endClass
@@ -400,7 +400,7 @@ endClass
 
 class Month : Cmd
   PROPERTIES
-    value : Int32
+    value : Int
 
   METHODS
     method init( t, value )
@@ -412,7 +412,7 @@ class Month : Cmd
     method description->String
       return "Month($)" (%value)
 
-    method to->Int32:     return value
+    method to->Int:     return value
     method to->String:    return value
 
 endClass
@@ -438,7 +438,7 @@ endClass
 
 class Year : Cmd
   PROPERTIES
-    value : Int32
+    value : Int
 
   METHODS
     method init( t, value )
@@ -450,7 +450,7 @@ class Year : Cmd
     method description->String
       return "Year($)" (%value)
 
-    method to->Int32:     return value
+    method to->Int:     return value
     method to->String:    return value
 
 endClass

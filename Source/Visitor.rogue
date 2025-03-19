@@ -1,5 +1,5 @@
 # Generated and updated by Froley. Custom changes will not be overwritten; customize as desired.
-module Days
+library Days
 
 class Visitor
   METHODS
@@ -12,19 +12,19 @@ class Visitor
       #     cmd.right = visit(cmd.right)
       #     return cmd
       if (cmd is null) return null
-      return cmd.dispatch<<on,ThisType,Cmd>>( this )
+      return cmd.dispatch<<on,$thisType,Cmd>>( this )
 
     method visit_content( cmd:Cmd ) [propagated]
       # Primarily for internal use - see on(Cmd) for usage.
-      cmd.dispatch<<on_visit,ThisType>>( this )
+      cmd.dispatch<<on_visit,$thisType>>( this )
 
     method visit_children( cmd:Cmd ) [propagated]
       # Call from 'on()' or 'on_visit()' handler to visit subtrees.
-      cmd.dispatch<<on_visit_children,ThisType>>( this )
+      cmd.dispatch<<on_visit_children,$thisType>>( this )
 
     method validate( cmd:Cmd )->Cmd [propagated]
       if (cmd is null) return null
-      return cmd.dispatch<<on_validate,ThisType,Cmd>>( this )
+      return cmd.dispatch<<on_validate,$thisType,Cmd>>( this )
 
     method on( cmd:Cmd )->Cmd
       # Default per-node Visitor call sequence.

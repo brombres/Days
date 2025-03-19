@@ -1,11 +1,11 @@
-module Days
+library Days
 
 class Resolver : Visitor
   METHODS
     method on( cmd:MD )->Cmd
       local y = Date.today.year
-      local m = cmd.month->Int32.clamped( 1, 12 )
-      local d = cmd.day->Int32.clamped_low( 1 )
+      local m = cmd.month->Int.clamped( 1, 12 )
+      local d = cmd.day->Int.clamped_low( 1 )
       if (d >= 100)
         # Interpret the day as the year - "May 2020"
         y = d
@@ -17,9 +17,9 @@ class Resolver : Visitor
       return visit( MDY(t,Month(t,m),Day(t,d),Year(t,y)) )
 
     method on( cmd:MDYOrYMD )->Cmd
-      local m = cmd.month->Int32
-      local d = cmd.day->Int32
-      local y = cmd.year->Int32
+      local m = cmd.month->Int
+      local d = cmd.day->Int
+      local y = cmd.year->Int
 
       if (m >= 100)
         # MDY is actually YMD

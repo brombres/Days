@@ -1,4 +1,4 @@
-module Days
+library Days
 
 $include "ParserCore.rogue"
 

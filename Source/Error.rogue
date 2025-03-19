@@ -1,6 +1,6 @@
-module Days
+library Days
 
-class Error( filepath:String, source:String, line:Int32, column:Int32, message:String ) : ::Error
+class Error( filepath:String, source:String, line:Int, column:Int, message:String ) : ::Error
   METHODS
     method init( filepath, message )
 

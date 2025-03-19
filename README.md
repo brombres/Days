@@ -3,8 +3,8 @@ Command line utility to compute dates and intervals.
 
 About     | Current Release
 ----------|-----------------------
-Version   | 3.0.1
-Date      | March 8, 2023
+Version   | 3.1
+Date      | March 19, 2025
 Platforms | Windows, macOS, Linux
 
 # Installation
